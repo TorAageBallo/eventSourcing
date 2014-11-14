@@ -2,10 +2,10 @@ package com.ballo.core.bank.event;
 
 import com.ballo.core.AggregateType;
 
-public class OpprettKontoEvent extends BankEvent {
+public class CreateAccountEvent extends BankEvent {
     private final String kontonr;
 
-    public OpprettKontoEvent(String kontonr) {
+    public CreateAccountEvent(String kontonr) {
         this.kontonr = kontonr;
     }
 

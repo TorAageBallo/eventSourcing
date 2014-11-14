@@ -2,16 +2,16 @@ package com.ballo.core.bank.event;
 
 import com.ballo.core.AggregateType;
 
-public class SettInnPengerEvent extends BankEvent {
+public class WithdrawMoneyEvent extends BankEvent {
     private final Integer beloep;
     private final String kontonr;
 
-    public SettInnPengerEvent(Integer beloep, String kontonr) {
+    public WithdrawMoneyEvent(Integer beloep, String kontonr) {
         this.beloep = beloep;
         this.kontonr = kontonr;
     }
 
-    public Integer getBeloep() {
+    public int getBeloep() {
         return beloep;
     }
 
