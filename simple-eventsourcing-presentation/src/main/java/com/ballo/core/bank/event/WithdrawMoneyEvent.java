@@ -11,7 +11,7 @@ public class WithdrawMoneyEvent extends BankEvent {
         this.kontonr = kontonr;
     }
 
-    public int getBeloep() {
+    public int getAmount() {
         return beloep;
     }
 

@@ -20,6 +20,10 @@ public class EventStore {
         publish(event);
     }
 
+    public void store(List<BankEvent> events) {
+        events.stream().forEach(this::store);
+    }
+
     private void publish(BankEvent event) {
         subscribers.get(event.getAggregateType()).stream()
                 .forEach(s -> s.handleEvent(event));

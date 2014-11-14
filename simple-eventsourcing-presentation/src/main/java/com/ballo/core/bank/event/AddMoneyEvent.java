@@ -11,7 +11,7 @@ public class AddMoneyEvent extends BankEvent {
         this.kontonr = kontonr;
     }
 
-    public Integer getBeloep() {
+    public Integer getAmount() {
         return beloep;
     }
 

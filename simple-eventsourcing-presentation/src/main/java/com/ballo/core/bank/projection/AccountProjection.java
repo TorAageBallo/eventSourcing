@@ -35,23 +35,24 @@ public class AccountProjection extends Projection {
     }
 
     private void handleWithdrawMoneyEvent(WithdrawMoneyEvent event) {
-        WithdrawMoneyEvent withdrawMoneyEvent = (WithdrawMoneyEvent) event;
-        Integer balanse = accountState.get(withdrawMoneyEvent.getAggregateId());
-        if (balanse < withdrawMoneyEvent.getBeloep()) {
-            System.out.println("Du har desverre ikke penger til å ta ut " + withdrawMoneyEvent.getBeloep());
+        Integer balanse = accountState.get(event.getAggregateId());
+        if (balanse < event.getAmount()) {
+            System.out.println("Du har desverre ikke penger til å ta ut " + event.getAmount());
             return;
         }
 
-        accountState.compute(withdrawMoneyEvent.getAggregateId(), (konto, verdi) -> (konto == null) ? verdi : verdi - withdrawMoneyEvent.getBeloep());
+        accountState.compute(event.getAggregateId(), (konto, verdi) -> (konto == null) ? verdi : verdi - event.getAmount());
+        System.out.println("Tatt ut " + event.getAmount() + " fra konto " + event.getAggregateId());
     }
 
     private void handleAddMoneyEvent(AddMoneyEvent event) {
-        AddMoneyEvent addMoneyEvent = (AddMoneyEvent) event;
-        accountState.compute(addMoneyEvent.getAggregateId(), (konto, verdi) -> konto == null ? verdi : verdi + addMoneyEvent.getBeloep());
+        accountState.compute(event.getAggregateId(), (konto, verdi) -> konto == null ? verdi : verdi + event.getAmount());
+        System.out.println("Satt inn " + event.getAmount() + " på konto " + event.getAggregateId());
     }
 
     private void handleCreateAccountEvent(BankEvent event) {
         accountState.putIfAbsent(event.getAggregateId(), 0);
+        System.out.println("Opprettet konto med kontonr " + event.getAggregateId());
     }
 
     public Integer getAccountBalance(String aggregateId) {
