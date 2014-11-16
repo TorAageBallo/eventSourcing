@@ -8,12 +8,12 @@ import com.ballo.core.bank.event.WithdrawMoneyEvent;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class AccountAggregate extends Aggregate {
+public class AccountAllowCreditAggregate extends Aggregate {
 
     private Integer accountState = null;
     private final String account;
 
-    public AccountAggregate(String account, List<BankEvent> events) {
+    public AccountAllowCreditAggregate(String account, List<BankEvent> events) {
         this.account = account;
         Consumer<BankEvent> createStateConsumer = bankEvent -> {
             if (bankEvent instanceof CreateAccountEvent)
@@ -45,22 +45,17 @@ public class AccountAggregate extends Aggregate {
         return accountState;
     }
 
-    private void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
-        if (accountState < withdrawMoneyEvent.getAmount()) {
-            System.out.println("Du har desverre ikke penger til å ta ut " + withdrawMoneyEvent.getAmount());
-            return;
-        }
-
+    public void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
         accountState -= withdrawMoneyEvent.getAmount();
         System.out.println("Tatt ut " + withdrawMoneyEvent.getAmount() + " fra konto " + withdrawMoneyEvent.getAggregateId());
     }
 
-    private void updateState(AddMoneyEvent addMoneyEvent) {
+    public void updateState(AddMoneyEvent addMoneyEvent) {
         accountState += addMoneyEvent.getAmount();
         System.out.println("Satt inn " + addMoneyEvent.getAmount() + " på konto " + addMoneyEvent.getAggregateId());
     }
 
-    private void updateState(CreateAccountEvent createAccountEvent) {
+    public void updateState(CreateAccountEvent createAccountEvent) {
         accountState = 0;
         System.out.println("Opprettet konto med kontonr " + createAccountEvent.getAggregateId());
     }

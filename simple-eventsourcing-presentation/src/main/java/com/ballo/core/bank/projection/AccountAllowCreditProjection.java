@@ -1,26 +1,28 @@
 package com.ballo.core.bank.projection;
 
 import com.ballo.core.AggregateType;
+import com.ballo.core.bank.aggregate.AccountAllowCreditAggregate;
 import com.ballo.core.bank.event.AddMoneyEvent;
 import com.ballo.core.bank.event.BankEvent;
 import com.ballo.core.bank.event.CreateAccountEvent;
 import com.ballo.core.bank.event.WithdrawMoneyEvent;
 import com.ballo.core.bank.repository.EventStore;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AccountProjection extends Projection {
+public class AccountAllowCreditProjection extends Projection {
 
-    static Map<String, Integer> accountState = new HashMap<>();
+    static Map<String, AccountAllowCreditAggregate> accountState = new HashMap<>();
 
-    public AccountProjection(EventStore eventStore) {
+    public AccountAllowCreditProjection(EventStore eventStore) {
         super(eventStore);
     }
 
     @Override
     public Integer getAccountBalance(String aggregateId) {
-        return AccountProjection.accountState.getOrDefault(aggregateId, 0);
+        return AccountAllowCreditProjection.accountState.get(aggregateId).getAccountState();
     }
 
     @Override
@@ -40,24 +42,17 @@ public class AccountProjection extends Projection {
     }
 
     private void handleWithdrawMoneyEvent(WithdrawMoneyEvent event) {
-        Integer balanse = accountState.get(event.getAggregateId());
-        if (balanse < event.getAmount()) {
-            System.out.println("Du har desverre ikke penger til å ta ut " + event.getAmount());
-            return;
-        }
-
-        accountState.compute(event.getAggregateId(), (konto, verdi) -> (konto == null) ? verdi : verdi - event.getAmount());
-        System.out.println("Tatt ut " + event.getAmount() + " fra konto " + event.getAggregateId());
+        AccountAllowCreditAggregate aggregate = accountState.get(event.getAggregateId());
+        aggregate.updateState(event);
     }
 
     private void handleAddMoneyEvent(AddMoneyEvent event) {
-        accountState.compute(event.getAggregateId(), (konto, verdi) -> konto == null ? verdi : verdi + event.getAmount());
-        System.out.println("Satt inn " + event.getAmount() + " på konto " + event.getAggregateId());
+        AccountAllowCreditAggregate aggregate = accountState.get(event.getAggregateId());
+        aggregate.updateState(event);
     }
 
     private void handleCreateAccountEvent(BankEvent event) {
-        accountState.putIfAbsent(event.getAggregateId(), 0);
-        System.out.println("Opprettet konto med kontonr " + event.getAggregateId());
+        accountState.putIfAbsent(event.getAggregateId(), new AccountAllowCreditAggregate(event.getAggregateId(), Arrays.asList(event)));
     }
 
 }

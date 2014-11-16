@@ -13,4 +13,6 @@ public abstract class Projection {
     protected abstract AggregateType getSubscribedType();
 
     public abstract void handleEvent(BankEvent event);
+
+    public abstract Integer getAccountBalance(String aggregateId);
 }

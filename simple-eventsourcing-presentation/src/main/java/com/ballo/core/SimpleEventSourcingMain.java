@@ -3,6 +3,8 @@ package com.ballo.core;
 import com.ballo.core.bank.CurrentStateBank;
 import com.ballo.core.bank.EventSourcedBank;
 import com.ballo.core.bank.aggregate.AccountAggregate;
+import com.ballo.core.bank.projection.AccountAllowCreditProjection;
+import com.ballo.core.bank.projection.AccountProjection;
 import com.ballo.core.bank.repository.EventStore;
 
 public class SimpleEventSourcingMain {
@@ -25,7 +27,7 @@ public class SimpleEventSourcingMain {
 
         // Ett eksempel på hvordan dette gjøres med Event
         EventStore eventStore = new EventStore();
-        EventSourcedBank eventSourcedBank = new EventSourcedBank(eventStore);
+        EventSourcedBank eventSourcedBank = new EventSourcedBank(eventStore, new AccountProjection(eventStore));
         eventSourcedBank.opprettKonto(kontonr);
         eventSourcedBank.settInn(100, kontonr);
         eventSourcedBank.taUt(150, kontonr);
@@ -46,6 +48,14 @@ public class SimpleEventSourcingMain {
 
         System.out.println("-----NEW AGGREGATE-----");
         eventSourcedBank.getAccountAggregate(kontonr);
+        System.out.println("Nåværende balanse er " + eventSourcedBank.hentBalanse(kontonr));
 
+        // Produkteier ønsker nå å ha funksjonalitet for å gi kreditt til sine kunder
+        System.out.println("-----ALLOW CREDIT USER STORY-----");
+        AccountAllowCreditProjection projection = new AccountAllowCreditProjection(eventStore);
+        eventStore.getBankEvents(kontonr)
+                .stream()
+                .forEach(projection::handleEvent);
+        System.out.println("Nåværende balanse er " + projection.getAccountBalance(kontonr));
     }
 }
