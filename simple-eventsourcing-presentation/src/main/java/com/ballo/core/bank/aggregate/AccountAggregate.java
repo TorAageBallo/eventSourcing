@@ -45,7 +45,7 @@ public class AccountAggregate extends Aggregate {
         return accountState;
     }
 
-    private void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
+    public void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
         if (accountState < withdrawMoneyEvent.getAmount()) {
             System.out.println("Du har desverre ikke penger til å ta ut " + withdrawMoneyEvent.getAmount());
             return;
@@ -55,12 +55,12 @@ public class AccountAggregate extends Aggregate {
         System.out.println("Tatt ut " + withdrawMoneyEvent.getAmount() + " fra konto " + withdrawMoneyEvent.getAggregateId());
     }
 
-    private void updateState(AddMoneyEvent addMoneyEvent) {
+    public void updateState(AddMoneyEvent addMoneyEvent) {
         accountState += addMoneyEvent.getAmount();
         System.out.println("Satt inn " + addMoneyEvent.getAmount() + " på konto " + addMoneyEvent.getAggregateId());
     }
 
-    private void updateState(CreateAccountEvent createAccountEvent) {
+    public void updateState(CreateAccountEvent createAccountEvent) {
         accountState = 0;
         System.out.println("Opprettet konto med kontonr " + createAccountEvent.getAggregateId());
     }

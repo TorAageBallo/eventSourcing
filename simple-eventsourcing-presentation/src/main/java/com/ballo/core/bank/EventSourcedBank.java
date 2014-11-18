@@ -1,6 +1,5 @@
 package com.ballo.core.bank;
 
-import com.ballo.core.bank.aggregate.AccountAggregate;
 import com.ballo.core.bank.event.AddMoneyEvent;
 import com.ballo.core.bank.event.CreateAccountEvent;
 import com.ballo.core.bank.event.WithdrawMoneyEvent;
@@ -34,7 +33,4 @@ public class EventSourcedBank {
         return accountProjection.getAccountBalance(kontonummer);
     }
 
-    public AccountAggregate getAccountAggregate(String kontonummer) {
-        return new AccountAggregate(kontonummer, eventStore.getBankEvents(kontonummer));
-    }
 }

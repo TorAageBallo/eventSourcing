@@ -16,18 +16,18 @@ public class CurrentStateBank {
     }
 
     public void settInn(Integer beloep, String kontonr) {
-        currentStateWay.compute(kontonr, (konto, verdi) -> konto == null ? verdi : verdi + beloep);
+        currentStateWay.compute(kontonr, (konto, verdi) -> verdi + beloep);
         System.out.println("Satt inn " + beloep + " på konto " + kontonr);
     }
 
     public void taUt(Integer beloep, String kontonr) {
-        Integer balanse = currentStateWay.get(kontonr);
+        Integer balanse = currentStateWay.getOrDefault(kontonr, 0);
         if (balanse < beloep) {
             System.out.println("Du har desverre ikke penger til å ta ut " + beloep);
             return;
         }
 
-        currentStateWay.compute(kontonr, (konto, verdi) -> (konto == null) ? verdi : verdi - beloep);
+        currentStateWay.compute(kontonr, (konto, verdi) -> verdi - beloep);
         System.out.println("Tatt ut " + beloep + " fra konto " + kontonr);
     }
 

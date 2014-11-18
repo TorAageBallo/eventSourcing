@@ -11,10 +11,9 @@ public class SimpleEventSourcingMain {
     public static void main(String[] args) {
          /*--------------------------------------------------------------
         |
-        |                           INTRO
+        |          Current State Bank
         |
         ---------------------------------------------------------------- */
-
         // I de fleste dagens systmer lagrer vi og vedlikeholder vi nåværende tilstand.
         String kontonr = "12345";
         CurrentStateBank currentStateBank = new CurrentStateBank();
@@ -25,7 +24,12 @@ public class SimpleEventSourcingMain {
         currentStateBank.settInn(25, kontonr);
         System.out.println("Nåværende balanse er " + currentStateBank.hentBalanse(kontonr));
 
-        // Ett eksempel på hvordan dette gjøres med Event
+        /*--------------------------------------------------------------
+        |
+        |          Event Sourced Bank
+        |
+        ---------------------------------------------------------------- */
+        // Ett eksempel på hvordan dette gjøres med Events
         EventStore eventStore = new EventStore();
         EventSourcedBank eventSourcedBank = new EventSourcedBank(eventStore, new AccountProjection(eventStore));
         eventSourcedBank.opprettKonto(kontonr);
@@ -35,10 +39,16 @@ public class SimpleEventSourcingMain {
         eventSourcedBank.settInn(25, kontonr);
         System.out.println("Nåværende balanse er " + eventSourcedBank.hentBalanse(kontonr));
 
+        /*--------------------------------------------------------------
+        |
+        |          Aggregate
+        |
+        ---------------------------------------------------------------- */
         // Hva hvis vi har et brukergrensesnitt som skal jobbe på balansen på konto og gjøre endringer uten at det skal lagres?
         System.out.println("-----AGGREGATE-----");
-        AccountAggregate accountAggregate = eventSourcedBank.getAccountAggregate(kontonr);
+        AccountAggregate accountAggregate = new AccountAggregate(kontonr, eventStore.getBankEvents(kontonr));
         System.out.println("Nåværende account state for konto " + kontonr + " er " + accountAggregate.getAccountState());
+        System.out.println("-----ENDRINGER FRA GUI-----");
         accountAggregate.addMoney(10_000);
         System.out.println("Nåværende account state for konto " + kontonr + " er " + accountAggregate.getAccountState());
         accountAggregate.withDrawMoney(10_000);
@@ -47,9 +57,14 @@ public class SimpleEventSourcingMain {
         eventStore.store(accountAggregate.getDerivedEvents());
 
         System.out.println("-----NEW AGGREGATE-----");
-        eventSourcedBank.getAccountAggregate(kontonr);
+        new AccountAggregate(kontonr, eventStore.getBankEvents(kontonr));
         System.out.println("Nåværende balanse er " + eventSourcedBank.hentBalanse(kontonr));
 
+        /*--------------------------------------------------------------
+        |
+        |          ALLOW CREDIT
+        |
+        ---------------------------------------------------------------- */
         // Produkteier ønsker nå å ha funksjonalitet for å gi kreditt til sine kunder
         System.out.println("-----ALLOW CREDIT USER STORY-----");
         AccountAllowCreditProjection projection = new AccountAllowCreditProjection(eventStore);
