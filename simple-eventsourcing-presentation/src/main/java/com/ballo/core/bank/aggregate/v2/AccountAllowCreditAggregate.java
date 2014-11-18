@@ -1,5 +1,6 @@
-package com.ballo.core.bank.aggregate;
+package com.ballo.core.bank.aggregate.v2;
 
+import com.ballo.core.bank.aggregate.Aggregate;
 import com.ballo.core.bank.event.AddMoneyEvent;
 import com.ballo.core.bank.event.BankEvent;
 import com.ballo.core.bank.event.CreateAccountEvent;

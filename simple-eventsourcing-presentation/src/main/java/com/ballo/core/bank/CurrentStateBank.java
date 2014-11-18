@@ -23,7 +23,7 @@ public class CurrentStateBank {
     public void withdrawMoney(Integer amount, String accountNr) {
         Integer currentBalance = currentStateWay.getOrDefault(accountNr, 0);
         if (currentBalance < amount) {
-            System.out.println("I'm sorry but you can't withdraw " + amount + " as your current balance is " + currentBalance + ".");
+            System.out.println("I'm sorry but you can't withdraw " + amount + " as your current balance is " + currentBalance);
             return;
         }
 

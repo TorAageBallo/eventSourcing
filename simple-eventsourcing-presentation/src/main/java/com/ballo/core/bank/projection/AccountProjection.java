@@ -15,7 +15,6 @@ import java.util.Map;
 public class AccountProjection extends Projection {
 
     static Map<String, AccountAggregate> accountState = new HashMap<>();
-
     public AccountProjection(EventStore eventStore) {
         super(eventStore);
     }

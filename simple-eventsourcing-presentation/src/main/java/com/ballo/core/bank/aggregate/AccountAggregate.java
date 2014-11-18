@@ -47,7 +47,7 @@ public class AccountAggregate extends Aggregate {
 
     public void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
         if (accountState < withdrawMoneyEvent.getAmount()) {
-            System.out.println("I'm sorry but you can't withdraw " + withdrawMoneyEvent.getAmount() + " as your current balance is " + accountState + ".");
+            System.out.println("I'm sorry but you can't withdraw " + withdrawMoneyEvent.getAmount() + " as your current balance is " + accountState);
             return;
         }
 

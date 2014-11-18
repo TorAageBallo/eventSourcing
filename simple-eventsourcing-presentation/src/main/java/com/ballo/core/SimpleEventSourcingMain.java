@@ -3,7 +3,7 @@ package com.ballo.core;
 import com.ballo.core.bank.CurrentStateBank;
 import com.ballo.core.bank.EventSourcedBank;
 import com.ballo.core.bank.aggregate.AccountAggregate;
-import com.ballo.core.bank.projection.AccountAllowCreditProjection;
+import com.ballo.core.bank.projection.v2.AccountAllowCreditProjection;
 import com.ballo.core.bank.projection.AccountProjection;
 import com.ballo.core.bank.repository.EventStore;
 
@@ -44,8 +44,8 @@ public class SimpleEventSourcingMain {
         |          Aggregate
         |
         ---------------------------------------------------------------- */
-        // What if we have a web page where wee want to see the effect of changes before we store our change?
         System.out.println("-----AGGREGATE-----");
+        // What if we have a web page where we want to see the effect of changes before we store our change?
         AccountAggregate accountAggregate = new AccountAggregate(accountNr, eventStore.getBankEvents(accountNr));
         writeCurrentBalance(accountAggregate.getAccountState());
 
@@ -65,7 +65,7 @@ public class SimpleEventSourcingMain {
 
         /*--------------------------------------------------------------
         |
-        |          ALLOW CREDIT
+        |          ALLOW CREDIT (V2)
         |
         ---------------------------------------------------------------- */
         // Our Event Store Bank now wants to allow unlimited credit to their customers.
@@ -76,6 +76,8 @@ public class SimpleEventSourcingMain {
                 .stream()
                 .forEach(projection::handleEvent);
         writeCurrentBalance(projection.getAccountBalance(accountNr));
+
+        writeBanner();
     }
 
     private static void writeCurrentBalanceToTheWebPage(Integer accountState) {
@@ -84,5 +86,16 @@ public class SimpleEventSourcingMain {
 
     private static void writeCurrentBalance(int balance) {
         System.out.println("Current balance is " + balance);
+    }
+
+    private static void writeBanner() {
+        System.out.println();
+        System.out.println("------Code at GitHub:-------------------------");
+        System.out.println("|                                            |");
+        System.out.println("|                                            |");
+        System.out.println("|     https://github.com/TorAageBallo        |");
+        System.out.println("|                                            |");
+        System.out.println("|                                            |");
+        System.out.println("----------------------------------------------");
     }
 }

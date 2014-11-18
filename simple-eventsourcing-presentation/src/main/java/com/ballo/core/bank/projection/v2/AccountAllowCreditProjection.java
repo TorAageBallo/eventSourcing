@@ -1,11 +1,12 @@
-package com.ballo.core.bank.projection;
+package com.ballo.core.bank.projection.v2;
 
 import com.ballo.core.AggregateType;
-import com.ballo.core.bank.aggregate.AccountAllowCreditAggregate;
+import com.ballo.core.bank.aggregate.v2.AccountAllowCreditAggregate;
 import com.ballo.core.bank.event.AddMoneyEvent;
 import com.ballo.core.bank.event.BankEvent;
 import com.ballo.core.bank.event.CreateAccountEvent;
 import com.ballo.core.bank.event.WithdrawMoneyEvent;
+import com.ballo.core.bank.projection.Projection;
 import com.ballo.core.bank.repository.EventStore;
 
 import java.util.Arrays;
