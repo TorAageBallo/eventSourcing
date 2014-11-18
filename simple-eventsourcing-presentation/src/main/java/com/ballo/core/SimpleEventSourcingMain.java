@@ -14,63 +14,75 @@ public class SimpleEventSourcingMain {
         |          Current State Bank
         |
         ---------------------------------------------------------------- */
-        // I de fleste dagens systmer lagrer vi og vedlikeholder vi nåværende tilstand.
-        String kontonr = "12345";
+        // In most of our system we obtain state like this
+        String accountNr = "12345";
         CurrentStateBank currentStateBank = new CurrentStateBank();
-        currentStateBank.opprettKonto(kontonr);
-        currentStateBank.settInn(100, kontonr);
-        currentStateBank.taUt(150, kontonr);
-        currentStateBank.taUt(50, kontonr);
-        currentStateBank.settInn(25, kontonr);
-        System.out.println("Nåværende balanse er " + currentStateBank.hentBalanse(kontonr));
+        currentStateBank.createAccount(accountNr);
+        currentStateBank.addMoney(100, accountNr);
+        currentStateBank.withdrawMoney(150, accountNr);
+        currentStateBank.withdrawMoney(50, accountNr);
+        currentStateBank.addMoney(25, accountNr);
+        writeCurrentBalance(currentStateBank.getBalance(accountNr));
 
         /*--------------------------------------------------------------
         |
         |          Event Sourced Bank
         |
         ---------------------------------------------------------------- */
-        // Ett eksempel på hvordan dette gjøres med Events
+        // This is how it can be done with Event Sourcing
         EventStore eventStore = new EventStore();
         EventSourcedBank eventSourcedBank = new EventSourcedBank(eventStore, new AccountProjection(eventStore));
-        eventSourcedBank.opprettKonto(kontonr);
-        eventSourcedBank.settInn(100, kontonr);
-        eventSourcedBank.taUt(150, kontonr);
-        eventSourcedBank.taUt(50, kontonr);
-        eventSourcedBank.settInn(25, kontonr);
-        System.out.println("Nåværende balanse er " + eventSourcedBank.hentBalanse(kontonr));
+        eventSourcedBank.createAccount(accountNr);
+        eventSourcedBank.addMoney(100, accountNr);
+        eventSourcedBank.withdrawMoney(150, accountNr);
+        eventSourcedBank.withdrawMoney(50, accountNr);
+        eventSourcedBank.addMoney(25, accountNr);
+        writeCurrentBalance(eventSourcedBank.getBalance(accountNr));
 
         /*--------------------------------------------------------------
         |
         |          Aggregate
         |
         ---------------------------------------------------------------- */
-        // Hva hvis vi har et brukergrensesnitt som skal jobbe på balansen på konto og gjøre endringer uten at det skal lagres?
+        // What if we have a web page where wee want to see the effect of changes before we store our change?
         System.out.println("-----AGGREGATE-----");
-        AccountAggregate accountAggregate = new AccountAggregate(kontonr, eventStore.getBankEvents(kontonr));
-        System.out.println("Nåværende account state for konto " + kontonr + " er " + accountAggregate.getAccountState());
-        System.out.println("-----ENDRINGER FRA GUI-----");
+        AccountAggregate accountAggregate = new AccountAggregate(accountNr, eventStore.getBankEvents(accountNr));
+        writeCurrentBalance(accountAggregate.getAccountState());
+
+        System.out.println("-----Changes from our web page-----");
         accountAggregate.addMoney(10_000);
-        System.out.println("Nåværende account state for konto " + kontonr + " er " + accountAggregate.getAccountState());
-        accountAggregate.withDrawMoney(10_000);
+        writeCurrentBalanceToTheWebPage(accountAggregate.getAccountState());
+        accountAggregate.withdrawMoney(10_000);
         accountAggregate.addMoney(1_000);
-        System.out.println("Nåværende account state for konto " + kontonr + " er " + accountAggregate.getAccountState());
+        writeCurrentBalanceToTheWebPage( accountAggregate.getAccountState());
+
+        System.out.println("-----We then hit the store changes button in our web gui-----");
         eventStore.store(accountAggregate.getDerivedEvents());
 
-        System.out.println("-----NEW AGGREGATE-----");
-        new AccountAggregate(kontonr, eventStore.getBankEvents(kontonr));
-        System.out.println("Nåværende balanse er " + eventSourcedBank.hentBalanse(kontonr));
+        System.out.println("-----We now retrieve our aggregate again-----");
+        AccountAggregate newAccountAggregate = new AccountAggregate(accountNr, eventStore.getBankEvents(accountNr));
+        writeCurrentBalance(newAccountAggregate.getAccountState());
 
         /*--------------------------------------------------------------
         |
         |          ALLOW CREDIT
         |
         ---------------------------------------------------------------- */
-        // Produkteier ønsker nå å ha funksjonalitet for å gi kreditt til sine kunder
+        // Our Event Store Bank now wants to allow unlimited credit to their customers.
         System.out.println("-----ALLOW CREDIT USER STORY-----");
+        // We create a new projection that allows credit, and run all our events through it to see what effect it will have
         AccountAllowCreditProjection projection = new AccountAllowCreditProjection(eventStore);
-        eventStore.getBankEvents(kontonr)
+        eventStore.getBankEvents(accountNr)
                 .stream()
                 .forEach(projection::handleEvent);
-        System.out.println("Nåværende balanse er " + projection.getAccountBalance(kontonr));
+        writeCurrentBalance(projection.getAccountBalance(accountNr));
+    }
+
+    private static void writeCurrentBalanceToTheWebPage(Integer accountState) {
+        System.out.println("Current balance in our web page is " + accountState);
+    }
+
+    private static void writeCurrentBalance(int balance) {
+        System.out.println("Current balance is " + balance);
     }
 }

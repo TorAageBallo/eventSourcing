@@ -10,28 +10,28 @@ public class CurrentStateBank {
         System.out.println("-----CURRENT STATE BANK-----");
     }
 
-    public void opprettKonto(String kontonr) {
-        currentStateWay.putIfAbsent(kontonr, 0);
-        System.out.println("Opprettet konto med kontonr " + kontonr);
+    public void createAccount(String accountNr) {
+        currentStateWay.putIfAbsent(accountNr, 0);
+        System.out.println("Created account with account number " + accountNr);
     }
 
-    public void settInn(Integer beloep, String kontonr) {
-        currentStateWay.compute(kontonr, (konto, verdi) -> verdi + beloep);
-        System.out.println("Satt inn " + beloep + " på konto " + kontonr);
+    public void addMoney(Integer amount, String accountNr) {
+        currentStateWay.compute(accountNr, (account, currentBalance) -> currentBalance + amount);
+        System.out.println("Added " + amount + " to account " + accountNr);
     }
 
-    public void taUt(Integer beloep, String kontonr) {
-        Integer balanse = currentStateWay.getOrDefault(kontonr, 0);
-        if (balanse < beloep) {
-            System.out.println("Du har desverre ikke penger til å ta ut " + beloep);
+    public void withdrawMoney(Integer amount, String accountNr) {
+        Integer currentBalance = currentStateWay.getOrDefault(accountNr, 0);
+        if (currentBalance < amount) {
+            System.out.println("I'm sorry but you can't withdraw " + amount + " as your current balance is " + currentBalance + ".");
             return;
         }
 
-        currentStateWay.compute(kontonr, (konto, verdi) -> verdi - beloep);
-        System.out.println("Tatt ut " + beloep + " fra konto " + kontonr);
+        currentStateWay.compute(accountNr, (account, balance) -> balance - amount);
+        System.out.println("Withdrawn " + amount + " from account " + accountNr);
     }
 
-    public int hentBalanse(String kontonummer) {
-        return currentStateWay.get(kontonummer);
+    public int getBalance(String accountNr) {
+        return currentStateWay.get(accountNr);
     }
 }

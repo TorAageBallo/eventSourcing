@@ -27,7 +27,7 @@ public class AccountProjection extends Projection {
 
     @Override
     protected AggregateType getSubscribedType() {
-        return AggregateType.KONTO;
+        return AggregateType.ACCOUNT;
     }
 
     @Override

@@ -3,19 +3,19 @@ package com.ballo.core.bank.event;
 import com.ballo.core.AggregateType;
 
 public class CreateAccountEvent extends BankEvent {
-    private final String kontonr;
+    private final String accountNr;
 
-    public CreateAccountEvent(String kontonr) {
-        this.kontonr = kontonr;
+    public CreateAccountEvent(String accountNr) {
+        this.accountNr = accountNr;
     }
 
     @Override
     public String getAggregateId() {
-        return kontonr;
+        return accountNr;
     }
 
     @Override
     public AggregateType getAggregateType() {
-        return AggregateType.KONTO;
+        return AggregateType.ACCOUNT;
     }
 }

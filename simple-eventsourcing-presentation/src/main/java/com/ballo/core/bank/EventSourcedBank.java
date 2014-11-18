@@ -17,20 +17,20 @@ public class EventSourcedBank {
         System.out.println("-----EVENT BANK-----");
     }
 
-    public void opprettKonto(String kontonr) {
-        eventStore.store(new CreateAccountEvent(kontonr));
+    public void createAccount(String accountNr) {
+        eventStore.store(new CreateAccountEvent(accountNr));
     }
 
-    public void settInn(Integer beloep, String kontonr) {
-        eventStore.store(new AddMoneyEvent(beloep, kontonr));
+    public void addMoney(Integer amount, String accountNr) {
+        eventStore.store(new AddMoneyEvent(amount, accountNr));
     }
 
-    public void taUt(Integer beloep, String kontonr) {
-        eventStore.store(new WithdrawMoneyEvent(beloep, kontonr));
+    public void withdrawMoney(Integer amount, String accountNr) {
+        eventStore.store(new WithdrawMoneyEvent(amount, accountNr));
     }
 
-    public int hentBalanse(String kontonummer) {
-        return accountProjection.getAccountBalance(kontonummer);
+    public int getBalance(String accountNr) {
+        return accountProjection.getAccountBalance(accountNr);
     }
 
 }

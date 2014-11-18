@@ -35,7 +35,7 @@ public class AccountAggregate extends Aggregate {
         derivedEvents.add(addMoneyEvent);
     }
 
-    public void withDrawMoney(Integer amount) {
+    public void withdrawMoney(Integer amount) {
         WithdrawMoneyEvent withdrawMoneyEvent = new WithdrawMoneyEvent(amount, account);
         updateState(withdrawMoneyEvent);
         derivedEvents.add(withdrawMoneyEvent);
@@ -47,21 +47,21 @@ public class AccountAggregate extends Aggregate {
 
     public void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
         if (accountState < withdrawMoneyEvent.getAmount()) {
-            System.out.println("Du har desverre ikke penger til å ta ut " + withdrawMoneyEvent.getAmount());
+            System.out.println("I'm sorry but you can't withdraw " + withdrawMoneyEvent.getAmount() + " as your current balance is " + accountState + ".");
             return;
         }
 
         accountState -= withdrawMoneyEvent.getAmount();
-        System.out.println("Tatt ut " + withdrawMoneyEvent.getAmount() + " fra konto " + withdrawMoneyEvent.getAggregateId());
+        System.out.println("Withdrawn " + withdrawMoneyEvent.getAmount() + " from account " + withdrawMoneyEvent.getAggregateId());
     }
 
     public void updateState(AddMoneyEvent addMoneyEvent) {
         accountState += addMoneyEvent.getAmount();
-        System.out.println("Satt inn " + addMoneyEvent.getAmount() + " på konto " + addMoneyEvent.getAggregateId());
+        System.out.println("Added " + addMoneyEvent.getAmount() + " to account " + addMoneyEvent.getAggregateId());
     }
 
     public void updateState(CreateAccountEvent createAccountEvent) {
         accountState = 0;
-        System.out.println("Opprettet konto med kontonr " + createAccountEvent.getAggregateId());
+        System.out.println("Created account with account number " + createAccountEvent.getAggregateId());
     }
 }
