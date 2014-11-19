@@ -2,11 +2,11 @@ package com.ballo.core.bank.event;
 
 import com.ballo.core.AggregateType;
 
-public class WithdrawMoneyEvent extends BankEvent {
+public class MoneyWithdrawnEvent extends BankEvent {
     private final Integer amount;
     private final String accountNr;
 
-    public WithdrawMoneyEvent(Integer amount, String accountNr) {
+    public MoneyWithdrawnEvent(Integer amount, String accountNr) {
         this.amount = amount;
         this.accountNr = accountNr;
     }

@@ -1,9 +1,9 @@
 package com.ballo.core.bank.aggregate;
 
-import com.ballo.core.bank.event.AddMoneyEvent;
+import com.ballo.core.bank.event.AccountCreatedEvent;
+import com.ballo.core.bank.event.MoneyAddedEvent;
 import com.ballo.core.bank.event.BankEvent;
-import com.ballo.core.bank.event.CreateAccountEvent;
-import com.ballo.core.bank.event.WithdrawMoneyEvent;
+import com.ballo.core.bank.event.MoneyWithdrawnEvent;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,12 +16,12 @@ public class AccountAggregate extends Aggregate {
     public AccountAggregate(String account, List<BankEvent> events) {
         this.account = account;
         Consumer<BankEvent> createStateConsumer = bankEvent -> {
-            if (bankEvent instanceof CreateAccountEvent)
-                updateState((CreateAccountEvent) bankEvent);
-            else if (bankEvent instanceof AddMoneyEvent)
-                updateState((AddMoneyEvent) bankEvent);
-            else if (bankEvent instanceof WithdrawMoneyEvent)
-                updateState((WithdrawMoneyEvent) bankEvent);
+            if (bankEvent instanceof AccountCreatedEvent)
+                updateState((AccountCreatedEvent) bankEvent);
+            else if (bankEvent instanceof MoneyAddedEvent)
+                updateState((MoneyAddedEvent) bankEvent);
+            else if (bankEvent instanceof MoneyWithdrawnEvent)
+                updateState((MoneyWithdrawnEvent) bankEvent);
         };
 
         events
@@ -30,38 +30,38 @@ public class AccountAggregate extends Aggregate {
     }
 
     public void addMoney(Integer amount) {
-        AddMoneyEvent addMoneyEvent = new AddMoneyEvent(amount, account);
-        updateState(addMoneyEvent);
-        derivedEvents.add(addMoneyEvent);
+        MoneyAddedEvent moneyAddedEvent = new MoneyAddedEvent(amount, account);
+        updateState(moneyAddedEvent);
+        derivedEvents.add(moneyAddedEvent);
     }
 
     public void withdrawMoney(Integer amount) {
-        WithdrawMoneyEvent withdrawMoneyEvent = new WithdrawMoneyEvent(amount, account);
-        updateState(withdrawMoneyEvent);
-        derivedEvents.add(withdrawMoneyEvent);
+        MoneyWithdrawnEvent moneyWithdrawnEvent = new MoneyWithdrawnEvent(amount, account);
+        updateState(moneyWithdrawnEvent);
+        derivedEvents.add(moneyWithdrawnEvent);
     }
 
     public Integer getAccountState() {
         return accountState;
     }
 
-    public void updateState(WithdrawMoneyEvent withdrawMoneyEvent) {
-        if (accountState < withdrawMoneyEvent.getAmount()) {
-            System.out.println("I'm sorry but you can't withdraw " + withdrawMoneyEvent.getAmount() + " as your current balance is " + accountState);
+    public void updateState(MoneyWithdrawnEvent moneyWithdrawnEvent) {
+        if (accountState < moneyWithdrawnEvent.getAmount()) {
+            System.out.println("I'm sorry but you can't withdraw " + moneyWithdrawnEvent.getAmount() + " as your current balance is " + accountState);
             return;
         }
 
-        accountState -= withdrawMoneyEvent.getAmount();
-        System.out.println("Withdrawn " + withdrawMoneyEvent.getAmount() + " from account " + withdrawMoneyEvent.getAggregateId());
+        accountState -= moneyWithdrawnEvent.getAmount();
+        System.out.println("Withdrawn " + moneyWithdrawnEvent.getAmount() + " from account " + moneyWithdrawnEvent.getAggregateId());
     }
 
-    public void updateState(AddMoneyEvent addMoneyEvent) {
-        accountState += addMoneyEvent.getAmount();
-        System.out.println("Added " + addMoneyEvent.getAmount() + " to account " + addMoneyEvent.getAggregateId());
+    public void updateState(MoneyAddedEvent moneyAddedEvent) {
+        accountState += moneyAddedEvent.getAmount();
+        System.out.println("Added " + moneyAddedEvent.getAmount() + " to account " + moneyAddedEvent.getAggregateId());
     }
 
-    public void updateState(CreateAccountEvent createAccountEvent) {
+    public void updateState(AccountCreatedEvent accountCreatedEvent) {
         accountState = 0;
-        System.out.println("Created account with account number " + createAccountEvent.getAggregateId());
+        System.out.println("Created account with account number " + accountCreatedEvent.getAggregateId());
     }
 }

@@ -16,7 +16,8 @@ public class CurrentStateBank {
     }
 
     public void addMoney(Integer amount, String accountNr) {
-        currentStateWay.compute(accountNr, (account, currentBalance) -> currentBalance + amount);
+        currentStateWay.compute(accountNr,
+                (account, currentBalance) -> currentBalance + amount);
         System.out.println("Added " + amount + " to account " + accountNr);
     }
 

@@ -2,10 +2,10 @@ package com.ballo.core.bank.projection.v2;
 
 import com.ballo.core.AggregateType;
 import com.ballo.core.bank.aggregate.v2.AccountAllowCreditAggregate;
-import com.ballo.core.bank.event.AddMoneyEvent;
+import com.ballo.core.bank.event.AccountCreatedEvent;
+import com.ballo.core.bank.event.MoneyAddedEvent;
 import com.ballo.core.bank.event.BankEvent;
-import com.ballo.core.bank.event.CreateAccountEvent;
-import com.ballo.core.bank.event.WithdrawMoneyEvent;
+import com.ballo.core.bank.event.MoneyWithdrawnEvent;
 import com.ballo.core.bank.projection.Projection;
 import com.ballo.core.bank.repository.EventStore;
 
@@ -33,21 +33,21 @@ public class AccountAllowCreditProjection extends Projection {
 
     @Override
     public void handleEvent(BankEvent event) {
-        if (event instanceof CreateAccountEvent) {
+        if (event instanceof AccountCreatedEvent) {
             handleCreateAccountEvent(event);
-        } else if (event instanceof AddMoneyEvent) {
-            handleAddMoneyEvent((AddMoneyEvent) event);
-        } else if (event instanceof WithdrawMoneyEvent) {
-            handleWithdrawMoneyEvent((WithdrawMoneyEvent) event);
+        } else if (event instanceof MoneyAddedEvent) {
+            handleAddMoneyEvent((MoneyAddedEvent) event);
+        } else if (event instanceof MoneyWithdrawnEvent) {
+            handleWithdrawMoneyEvent((MoneyWithdrawnEvent) event);
         }
     }
 
-    private void handleWithdrawMoneyEvent(WithdrawMoneyEvent event) {
+    private void handleWithdrawMoneyEvent(MoneyWithdrawnEvent event) {
         AccountAllowCreditAggregate aggregate = accountState.get(event.getAggregateId());
         aggregate.updateState(event);
     }
 
-    private void handleAddMoneyEvent(AddMoneyEvent event) {
+    private void handleAddMoneyEvent(MoneyAddedEvent event) {
         AccountAllowCreditAggregate aggregate = accountState.get(event.getAggregateId());
         aggregate.updateState(event);
     }
